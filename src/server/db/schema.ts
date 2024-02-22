@@ -1,41 +1,55 @@
+// import "server-only"; // Make sure you can't import this on client
+
+// LIBS
+import { type AdapterAccount } from "next-auth/adapters";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   index,
   int,
+  mysqlEnum,
   mysqlTableCreator,
   primaryKey,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/mysql-core";
-import { type AdapterAccount } from "next-auth/adapters";
 
-/**
- * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
+// UTILS
+import { type InferSqlTable, type Prettify } from "~/lib/type-utils";
+
+// CONSTS
+export const COLOR_THEMES = [
+  "bland",
+  "bumblebee",
+  "coffee",
+  "cupcake",
+  "forest",
+  "galaxy",
+  "lavender",
+  "valentine",
+] as const;
+export type ColorTheme = (typeof COLOR_THEMES)[number];
+
+export const USER_ROLES = ["ADMIN", "USER", "RESTRICTED"] as const;
+export type UserRole = (typeof users.role.enumValues)[number];
+
+// export const TASK_TIMEFRAMES = ["DAY", "WEEK", "FORTNIGHT", "MONTH"] as const;
+// export type TaskTimeframe = (typeof tasks.timeframe.enumValues)[number];
+
+// INSTANTIATE SCHEMA
 export const createTable = mysqlTableCreator((name) => `poe_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("createdById", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt").onUpdateNow(),
-  },
-  (example) => ({
-    createdByIdIdx: index("createdById_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
-
+// User & Auth tables
+export type DbUser = Prettify<
+  InferSqlTable<typeof users> & {
+    accounts?: Account[];
+    // tasks?: Task[];
+    comments?: Comment[];
+    // profilePictures?: ProfilePicture[];
+  }
+>;
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
@@ -45,13 +59,19 @@ export const users = createTable("user", {
     fsp: 3,
   }).default(sql`CURRENT_TIMESTAMP(3)`),
   image: varchar("image", { length: 255 }),
+  role: mysqlEnum("role", USER_ROLES).default(USER_ROLES[1]),
+  colorTheme: mysqlEnum("colorTheme", COLOR_THEMES).default(COLOR_THEMES[5]),
+  showCompletedTasksDefault: boolean("showCompletedTasks").default(false),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
-  sessions: many(sessions),
+  // tasks: many(tasks),
+  // comments: many(comments),
+  // profilePictures: many(profilePictures),
 }));
 
+export type Account = Prettify<InferSqlTable<typeof accounts>>;
 export const accounts = createTable(
   "account",
   {
@@ -70,11 +90,9 @@ export const accounts = createTable(
     session_state: varchar("session_state", { length: 255 }),
   },
   (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-    userIdIdx: index("accounts_userId_idx").on(account.userId),
-  })
+    compoundKey: primaryKey(account.provider, account.providerAccountId),
+    userIdIdx: index("userId_idx").on(account.userId),
+  }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -91,12 +109,12 @@ export const sessions = createTable(
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
   (session) => ({
-    userIdIdx: index("session_userId_idx").on(session.userId),
-  })
+    userIdIdx: index("userId_idx").on(session.userId),
+  }),
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  userId: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
 export const verificationTokens = createTable(
@@ -107,6 +125,146 @@ export const verificationTokens = createTable(
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
   (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+    compoundKey: primaryKey(vt.identifier, vt.token),
+  }),
 );
+
+// export type ProfilePicture = Prettify<
+//   InferSqlTable<typeof profilePictures> & {
+//     user?: DbUser[];
+//   }
+// >;
+// export const profilePictures = createTable(
+//   "profilePicture",
+//   {
+//     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
+//     userId: varchar("userId", { length: 255 }).notNull(),
+//     url: varchar("url", { length: 255 }).notNull(),
+//     createdAt: timestamp("created_at")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .notNull(),
+//   },
+//   (profilePicture) => ({
+//     userIdIdx: index("userId_Idx").on(profilePicture.userId),
+//     idIndex: index("id_Idx").on(profilePicture.id),
+//   }),
+// );
+
+// export const profilePictureRelations = relations(
+//   profilePictures,
+//   ({ one }) => ({
+//     userId: one(users, {
+//       fields: [profilePictures.userId],
+//       references: [users.id],
+//     }),
+//   }),
+// );
+
+// export type Task = Prettify<
+//   InferSqlTable<typeof tasks> & {
+//     // comments?: Partial<Comment>[];
+//     taskCompletions?: TaskCompletion[];
+//   }
+// >;
+// export const tasks = createTable(
+//   "task",
+//   {
+//     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
+//     title: varchar("title", { length: 256 }).notNull(),
+//     userId: varchar("user", { length: 255 }).notNull(),
+//     timesToComplete: int("timesToComplete").default(1).notNull(),
+//     timeframe: mysqlEnum("timeframe", TASK_TIMEFRAMES)
+//       .default(TASK_TIMEFRAMES[0])
+//       .notNull(),
+//     createdAt: timestamp("created_at")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .notNull(),
+//     updatedAt: timestamp("updatedAt")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .onUpdateNow()
+//       .notNull(),
+//   },
+//   (task) => ({
+//     createdByIdIdx: index("createdById_idx").on(task.userId),
+//     nameIndex: index("name_idx").on(task.title),
+//   }),
+// );
+
+// export const tasksRelations = relations(tasks, ({ one, many }) => ({
+//   userId: one(users, { fields: [tasks.userId], references: [users.id] }),
+//   taskCompletions: many(taskCompletions),
+//   comments: many(comments),
+// }));
+
+// export type TaskCompletion = Prettify<
+//   InferSqlTable<typeof taskCompletions> & {
+//     task?: Partial<Task>[];
+//     user?: Partial<DbUser>[];
+//   }
+// >;
+// export const taskCompletions = createTable(
+//   "taskCompletion",
+//   {
+//     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
+//     taskId: bigint("taskId", { mode: "number" }).notNull(),
+//     userId: varchar("user", { length: 255 }).notNull(),
+//     timeframeCompletion: boolean("timeframeCompletion")
+//       .default(false)
+//       .notNull(),
+//     createdAt: timestamp("created_at")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .notNull(),
+//     updatedAt: timestamp("updatedAt")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .onUpdateNow()
+//       .notNull(),
+//   },
+//   (taskCompletion) => ({
+//     tcompIdIdx: index("tcompId_idx").on(taskCompletion.id),
+//   }),
+// );
+
+// export const tcRelations = relations(taskCompletions, ({ one }) => ({
+//   task: one(tasks, {
+//     fields: [taskCompletions.taskId],
+//     references: [tasks.id],
+//   }),
+//   userId: one(users, {
+//     fields: [taskCompletions.userId],
+//     references: [users.id],
+//   }),
+// }));
+
+// export type Comment = Prettify<
+//   InferSqlTable<typeof comments> & {
+//     task?: Partial<Task>[];
+//     user?: Partial<DbUser>[];
+//   }
+// >;
+// export const comments = createTable(
+//   "comment",
+//   {
+//     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
+//     taskId: bigint("taskId", { mode: "number" }).notNull(),
+//     userId: varchar("user", { length: 255 }).notNull(),
+//     content: text("content").notNull(),
+//     createdAt: timestamp("created_at")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .notNull(),
+//     updatedAt: timestamp("updatedAt")
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .onUpdateNow()
+//       .notNull(),
+//   },
+//   (comment) => ({
+//     taskIdIdx: index("taskId_idx").on(comment.taskId),
+//   }),
+// );
+
+// export const commentsRelations = relations(comments, ({ one }) => ({
+//   task: one(tasks, { fields: [comments.taskId], references: [tasks.id] }),
+//   user: one(users, {
+//     fields: [comments.userId],
+//     references: [users.id],
+//   }),
+// }));
