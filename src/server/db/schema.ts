@@ -39,7 +39,7 @@ export type UserRole = (typeof users.role.enumValues)[number];
 // export type TaskTimeframe = (typeof tasks.timeframe.enumValues)[number];
 
 // INSTANTIATE SCHEMA
-export const createTable = mysqlTableCreator((name) => `poe_${name}`);
+export const poeTable = mysqlTableCreator((name) => `poe_${name}`);
 
 // User & Auth tables
 export type DbUser = Prettify<
@@ -50,7 +50,7 @@ export type DbUser = Prettify<
     // profilePictures?: ProfilePicture[];
   }
 >;
-export const users = createTable("user", {
+export const users = poeTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
@@ -72,7 +72,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export type Account = Prettify<InferSqlTable<typeof accounts>>;
-export const accounts = createTable(
+export const accounts = poeTable(
   "account",
   {
     userId: varchar("userId", { length: 255 }).notNull(),
@@ -99,7 +99,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }));
 
-export const sessions = createTable(
+export const sessions = poeTable(
   "session",
   {
     sessionToken: varchar("sessionToken", { length: 255 })
@@ -117,7 +117,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   userId: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const verificationTokens = createTable(
+export const verificationTokens = poeTable(
   "verificationToken",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
@@ -134,7 +134,7 @@ export const verificationTokens = createTable(
 //     user?: DbUser[];
 //   }
 // >;
-// export const profilePictures = createTable(
+// export const profilePictures = poeTable(
 //   "profilePicture",
 //   {
 //     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
@@ -166,7 +166,7 @@ export const verificationTokens = createTable(
 //     taskCompletions?: TaskCompletion[];
 //   }
 // >;
-// export const tasks = createTable(
+// export const tasks = poeTable(
 //   "task",
 //   {
 //     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
@@ -202,7 +202,7 @@ export const verificationTokens = createTable(
 //     user?: Partial<DbUser>[];
 //   }
 // >;
-// export const taskCompletions = createTable(
+// export const taskCompletions = poeTable(
 //   "taskCompletion",
 //   {
 //     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
@@ -241,7 +241,7 @@ export const verificationTokens = createTable(
 //     user?: Partial<DbUser>[];
 //   }
 // >;
-// export const comments = createTable(
+// export const comments = poeTable(
 //   "comment",
 //   {
 //     id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
