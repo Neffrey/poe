@@ -13,8 +13,8 @@ const UsefulLinks = () => {
             <UsefulLinkSingle
               className={BgColorizor(
                 i,
-                "bg-primary/80 text-primary-foreground",
-                "bg-secondary/80 text-secondary-foreground",
+                "bg-primary/80 text-primary-foreground hover:border-b-primary-foreground hover:bg-primary/90",
+                "bg-secondary/80 text-secondary-foreground hover:border-b-secondary-foreground hover:bg-secondary/90",
               )}
               link={link}
               key={`info-${i}`}
@@ -29,11 +29,11 @@ const UsefulLinks = () => {
             <UsefulLinkSingle
               className={BgColorizor(
                 i,
-                "bg-secondary/80 text-secondary-foreground",
-                "bg-primary/80 text-primary-foreground",
+                "bg-secondary/80 text-secondary-foreground hover:border-b-secondary-foreground hover:bg-secondary/90",
+                "bg-primary/80 text-primary-foreground hover:border-b-primary-foreground hover:bg-primary/90",
               )}
               link={link}
-              key={`info-${i}`}
+              key={`gameTools-${i}`}
             />
           ))}
         </div>
@@ -45,11 +45,11 @@ const UsefulLinks = () => {
             <UsefulLinkSingle
               className={BgColorizor(
                 i,
-                "bg-primary/80 text-primary-foreground",
-                "bg-secondary/80 text-secondary-foreground",
+                "bg-primary/80 text-primary-foreground hover:border-b-primary-foreground hover:bg-primary/90",
+                "bg-secondary/80 text-secondary-foreground hover:border-b-secondary-foreground hover:bg-secondary/90",
               )}
               link={link}
-              key={`info-${i}`}
+              key={`tradeTools-${i}`}
             />
           ))}
         </div>
@@ -61,11 +61,11 @@ const UsefulLinks = () => {
             <UsefulLinkSingle
               className={BgColorizor(
                 i,
-                "bg-secondary/80 text-secondary-foreground",
-                "bg-primary/80 text-primary-foreground",
+                "bg-secondary/80 text-secondary-foreground hover:border-b-secondary-foreground hover:bg-secondary/90",
+                "bg-primary/80 text-primary-foreground hover:border-b-primary-foreground hover:bg-primary/90",
               )}
               link={link}
-              key={`info-${i}`}
+              key={`guides-${i}`}
             />
           ))}
         </div>
@@ -85,7 +85,7 @@ const UsefulLinkSingle = ({
   link: UsefulLink;
 }) => {
   return (
-    <div className={cn("rounded-sm", className)}>
+    <div className={cn("rounded-sm border-b-4 border-transparent", className)}>
       <a
         href={link.url}
         target="_blank"

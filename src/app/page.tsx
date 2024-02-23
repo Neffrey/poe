@@ -16,7 +16,7 @@ const Home = () => {
           nPoE
         </h1>
         <h2 className="text-bg-foreground w-full text-center text-xl tracking-wider">
-          Just a few useful links & tools
+          Just a few useful links & tools for my favorite game
         </h2>
         <div className="flex flex-col justify-center text-center">
           <h2 className="text-2xl font-bold">{`Neffrey's Tools - Coming Soon!!`}</h2>
