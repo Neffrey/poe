@@ -21,8 +21,8 @@ const Home = () => {
         <div className="flex flex-col justify-center text-center">
           <h2 className="text-2xl font-bold">{`Neffrey's Tools - Coming Soon!!`}</h2>
           <h3 className="capitalize">
-            arbitrage trade tool - sextant rolling helper - gem leveling - Mage
-            blood flask helper
+            arbitrage trade tool - sextant rolling helper - gem profit
+            calculator - Mage blood flask helper
           </h3>
         </div>
         <UsefulLinks />
