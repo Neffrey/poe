@@ -1,6 +1,12 @@
 const CURRENT_LEAGUE = "affliction";
 
-export const links = {
+export type UsefulLink = {
+  title: string;
+  description: string;
+  url: string;
+};
+
+export const usefulLinks = {
   neffs: [
     // arbitrage tool
     // sextant rolling helper
@@ -10,25 +16,18 @@ export const links = {
   information: [
     {
       title: "PoE Wiki",
-      description:
-        "Comprehensive online resource that provides detailed information, strategies, and community-driven insights",
+      description: "Comprehensive online resource for all things PoE",
       url: "https://www.poewiki.net/wiki/Path_of_Exile_Wiki",
     },
     {
       title: "Craft of Exile",
-      description:
-        "A crafting simulator that helps you plan and execute your crafting strategies",
+      description: "Crafting simulator and calculator",
       url: "https://www.craftofexile.com/",
-    },
-    {
-      title: "PoE Ladder Ancient Orb Tool",
-      description: "A tool to show odds on Ancient Orb targets",
-      url: "https://poeladder.com/ancient",
     },
     {
       title: "Map Comparison",
       description:
-        "Compare maps in the current map pool on various metrics such as openness, linearity, rushable boss, and more",
+        "Compare maps in the current map pool on  metrics like openness, linearity, etc",
       url: "https://poeatlas.app/",
     },
     {
@@ -43,12 +42,6 @@ export const links = {
         "View the current lab layouts to help you navigate the labyrinth faster",
       url: "https://www.poelab.com/",
     },
-    {
-      title: "Acts Guide",
-      description:
-        "A guide to help you navigate the acts more quickly and efficiently",
-      url: "https://www.poe-vault.com/guides/quick-reference-leveling-guide-act-1",
-    },
   ],
   gameTools: [
     {
@@ -60,7 +53,7 @@ export const links = {
     {
       title: "Path of Regex",
       description:
-        "A powerful tool for searching specific stats on items, maps, and more",
+        "Tool for in-game searching of specific stats on items, maps, and more",
       url: "https://poe.re/",
     },
     {
@@ -102,6 +95,12 @@ export const links = {
     },
   ],
   guides: [
+    {
+      title: "Acts Guide",
+      description:
+        "A guide to help you navigate the acts more quickly and efficiently",
+      url: "https://www.poe-vault.com/guides/quick-reference-leveling-guide-act-1",
+    },
     {
       title: "PoE Ninja Builds",
       description:
