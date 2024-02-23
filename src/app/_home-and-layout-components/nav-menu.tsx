@@ -16,10 +16,7 @@ type NavItems = {
 }[];
 
 // Nav items
-const navItems: NavItems = [
-  { title: "Tasks", href: "/" },
-  { title: "Users", href: "/users" },
-];
+const navItems: NavItems = [{ title: "Useful Links", href: "/" }];
 
 const NavMenu = () => {
   return (
@@ -36,11 +33,6 @@ const NavMenu = () => {
           </Link>
         );
       })}
-      <Link href="account" tabIndex={-1}>
-        <Button variant={"ghost"} className="text-primary-foreground">
-          My Account
-        </Button>
-      </Link>
     </div>
   );
 };
